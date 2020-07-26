@@ -23,8 +23,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         | Left              | Down | Right              |
      */
     [0] = LAYOUT(
-        KC_MUTE, MO(1), KC_MPLY,
-        KC_LGUI, KC_UP  , KC_MENU,
+        KC_MUTE, , MO(1), KC_MPLY,
+        KC_LGUI , KC_UP  , KC_COPY,
         KC_LEFT, KC_DOWN, KC_RGHT
     ),
     /*
@@ -34,8 +34,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      */
     [1] = LAYOUT(
         RESET  , _______, KC_STOP,
-        KC_HOME, KC_PSCREEN, KC_END,
-        KC_COPY, KC_CUT, KC_PASTE
+        KC_HOME, KC_PSCREEN , KC_END
+	KC_COPY, KC_CUT, KC_PASTE
+      
     ),
 };
 
