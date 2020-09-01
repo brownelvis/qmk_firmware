@@ -12,6 +12,9 @@
 #define LOWER MO(_LOWER)
 #define SYS MO(_SYS)
 
+bool is_alt_tab_active = false;
+uint16_t alt_tab_timer = 0;
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_QWERTY] = LAYOUT_5x6(
@@ -60,3 +63,80 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                              _______,_______,            _______,_______
   ),
 };
+
+#ifdef ENCODER_ENABLE
+void encoder_update_user(uint8_t index, bool clockwise) {
+if (index == 0) {
+switch(get_highest_layer(layer_state)){
+case 1:
+if (clockwise) {
+      tap_code16(KC_VOLU);
+    } else {
+      tap_code16(KC_VOLD);
+    }
+   break;
+case 2:
+    if (clockwise) {
+  if (!is_alt_tab_active) {
+    is_alt_tab_active = true;
+    register_code(KC_LALT);
+  }
+  alt_tab_timer = timer_read();
+  tap_code16(KC_TAB);
+} else {
+  alt_tab_timer = timer_read();
+  tap_code16(S(KC_TAB));
+}
+   break;
+default:
+if (clockwise) {
+      tap_code16(KC_PGDN);
+    } else {
+      tap_code16(KC_PGUP);
+    }
+break;
+}
+}
+if (index == 1) {
+switch(get_highest_layer(layer_state)){
+case 1:
+if (clockwise) {
+      tap_code16(KC_VOLU);
+    } else {
+      tap_code16(KC_VOLD);
+    }
+   break;
+case 2:
+    if (clockwise) {
+  if (!is_alt_tab_active) {
+    is_alt_tab_active = true;
+    register_code(KC_LALT);
+  }
+  alt_tab_timer = timer_read();
+  tap_code16(KC_TAB);
+} else {
+  alt_tab_timer = timer_read();
+  tap_code16(S(KC_TAB));
+}
+   break;
+default:
+if (clockwise) {
+      tap_code16(KC_PGDN);
+    } else {
+      tap_code16(KC_PGUP);
+    }
+break;
+}
+}
+}
+					
+#endif // ENCODER_ENABLE
+
+void matrix_scan_user(void) {
+  if (is_alt_tab_active) {
+    if (timer_elapsed(alt_tab_timer) > 1250) {
+      unregister_code(KC_LALT);
+      is_alt_tab_active = false;
+    }
+  }
+}

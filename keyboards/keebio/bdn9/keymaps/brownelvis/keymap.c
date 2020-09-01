@@ -15,17 +15,20 @@
  */
 #include QMK_KEYBOARD_H
 
+bool is_alt_tab_active = false;
+uint16_t alt_tab_timer = 0;
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
         | Knob 1: Vol Dn/Up |      | Knob 2: Page Dn/Up |
         | Press: Mute       | Home | Press: Play/Pause  |
         | Hold: Layer 2     | Up   | RGB Mode           |
         | Left              | Down | Right              |
-     */
+     */	
     [0] = LAYOUT(
-        KC_MUTE, , MO(1), KC_MPLY,
-        KC_LGUI , KC_UP  , KC_COPY,
-        KC_LEFT, KC_DOWN, KC_RGHT
+        LALT(KC_F4), MO(1), KC_MUTE,
+        LCTL(KC_C), LCTL(KC_X), LCTL(KC_V),
+        KC_WBAK, KC_WREF, KC_WFWD
     ),
     /*
         | RESET          | N/A  | Media Stop |
@@ -33,26 +36,66 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         | Media Previous | End  | Media Next |
      */
     [1] = LAYOUT(
-        RESET  , _______, KC_STOP,
-        KC_HOME, KC_PSCREEN , KC_END
-	KC_COPY, KC_CUT, KC_PASTE
+        RESET, _______, KC_STOP,
+        KC_MYCM, KC_WHOM, KC_MAIL,
+	RGB_MODE_FORWARD, RGB_HUI, RGB_SAI
       
     ),
 };
 
+#ifdef ENCODER_ENABLE
 void encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {
-        if (clockwise) {
-            tap_code(KC_VOLU);
-        } else {
-            tap_code(KC_VOLD);
-        }
+if (index == 0) {
+switch(get_highest_layer(layer_state)){
+case 1:
+if (clockwise) {
+      tap_code16(KC_DOWN);
+    } else {
+      tap_code16(KC_UP);
     }
-    else if (index == 1) {
-        if (clockwise) {
-            tap_code(KC_PGDN);
-        } else {
-            tap_code(KC_PGUP);
-        }
+   break;
+default:
+if (clockwise) {
+      tap_code16(KC_PGDN);
+    } else {
+      tap_code16(KC_PGUP);
     }
+break;
+}
+}
+if (index == 1) {
+switch(get_highest_layer(layer_state)){
+case 1:
+if (clockwise) {
+      tap_code16(KC_VOLU);
+    } else {
+      tap_code16(KC_VOLD);
+    }
+   break;
+default:
+    if (clockwise) {
+  if (!is_alt_tab_active) {
+    is_alt_tab_active = true;
+    register_code(KC_LALT);
+  }
+  alt_tab_timer = timer_read();
+  tap_code16(KC_TAB);
+} else {
+  alt_tab_timer = timer_read();
+  tap_code16(S(KC_TAB));
+}
+   break;
+}
+}
+}
+					
+#endif // ENCODER_ENABLE
+
+void matrix_scan_user(void) {
+  if (is_alt_tab_active) {
+    if (timer_elapsed(alt_tab_timer) > 1250) {
+      unregister_code(KC_LALT);
+      is_alt_tab_active = false;
+    }
+  }
 }
