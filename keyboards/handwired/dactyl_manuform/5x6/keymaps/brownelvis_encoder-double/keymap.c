@@ -24,8 +24,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      KC_LCTL, KC_Z  , KC_X  , KC_C  , KC_V  , KC_B  ,                         KC_N  , KC_M  ,KC_COMM,KC_DOT,KC_DOWN,KC_RIGHT,
                       KC_PGUP,KC_PGDN,                                                       KC_LEFT, KC_UP,
                                       RAISE,KC_SPC,                           KC_ENT, LOWER,
-                                      OSM(MOD_RCTL), KC_DEL,                  KC_BSPACE, OSM(MOD_RALT),
-                                      TG(LOWER), KC_LGUI,                     KC_HOME, KC_END                        
+                                      KC_RCTL, KC_DEL,                        KC_BSPACE, KC_RALT,
+                                      KC_LSFT, KC_LGUI,                       KC_RGUI, KC_RSFT                        
   ),
 
   [_LOWER] = LAYOUT_5x6(
@@ -49,7 +49,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                _______,_______,            _______,_______,
                                                _______,_______,            SYS,_______,
                                                _______,_______,            _______,_______,
-                                               KC_MUTE,KC_PSCR,            KC_VOLU,KC_VOLD
+                                               _______,KC_PSCR,            _______,_______
   ),
 
   [_SYS] = LAYOUT_5x6(
@@ -70,13 +70,20 @@ if (index == 0) {
 switch(get_highest_layer(layer_state)){
 case 1:
 if (clockwise) {
+  tap_code16(C(KC_TAB));
+} else {
+  tap_code16(S(C(KC_TAB)));
+}
+   break;
+case 2:
+if (clockwise) {
       tap_code16(KC_VOLU);
     } else {
       tap_code16(KC_VOLD);
     }
    break;
-case 2:
-    if (clockwise) {
+default:
+if (clockwise) {
   if (!is_alt_tab_active) {
     is_alt_tab_active = true;
     register_code(KC_LALT);
@@ -88,36 +95,22 @@ case 2:
   tap_code16(S(KC_TAB));
 }
    break;
-default:
-if (clockwise) {
-      tap_code16(KC_PGDN);
-    } else {
-      tap_code16(KC_PGUP);
-    }
-break;
 }
 }
 if (index == 1) {
 switch(get_highest_layer(layer_state)){
 case 1:
 if (clockwise) {
-      tap_code16(KC_VOLU);
-    } else {
-      tap_code16(KC_VOLD);
-    }
-   break;
-case 2:
-    if (clockwise) {
-  if (!is_alt_tab_active) {
-    is_alt_tab_active = true;
-    register_code(KC_LALT);
-  }
-  alt_tab_timer = timer_read();
-  tap_code16(KC_TAB);
+  tap_code16(C(KC_RGHT));
 } else {
-  alt_tab_timer = timer_read();
-  tap_code16(S(KC_TAB));
+  tap_code16(C(KC_LEFT));
 }
+case 2:
+if (clockwise) {
+      tap_code16(KC_MS_WH_DOWN);
+    } else {
+      tap_code16(KC_MS_WH_UP);
+    }
    break;
 default:
 if (clockwise) {
